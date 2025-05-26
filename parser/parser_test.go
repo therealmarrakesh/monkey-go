@@ -99,9 +99,11 @@ func TestIdentifierExpression(t *testing.T) {
 	if !ok {
 		t.Fatalf("exp not *ast.Identifier. got=%T", stmt.Expression)
 	}
+
 	if ident.Value != "foobar" {
 		t.Errorf("ident.Value not %s. got=%s", "foobar", ident.Value)
 	}
+
 	if ident.TokenLiteral() != "foobar" {
 		t.Errorf("ident.TokenLiteral not %s. got=%s", "foobar",
 			ident.TokenLiteral())
@@ -130,9 +132,11 @@ func TestIntegerLiteralExpression(t *testing.T) {
 	if !ok {
 		t.Fatalf("exp not *ast.IntegerLiteral. got=%T", stmt.Expression)
 	}
+
 	if literal.Value != 5 {
 		t.Errorf("literal.Value not %d. got=%d", 5, literal.Value)
 	}
+
 	if literal.TokenLiteral() != "5" {
 		t.Errorf("literal.TokenLiteral not %s. got=%s", "5",
 			literal.TokenLiteral())
@@ -174,10 +178,12 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		if !ok {
 			t.Fatalf("stmt is not ast.PrefixExpression. got=%T", stmt.Expression)
 		}
+
 		if exp.Operator != tt.operator {
 			t.Fatalf("exp.Operator is not '%s'. got=%s",
 				tt.operator, exp.Operator)
 		}
+
 		if !testLiteralExpression(t, exp.Right, tt.value) {
 			return
 		}
@@ -945,6 +951,37 @@ func TestParsingHashLiteralsWithExpressions(t *testing.T) {
 		}
 
 		testFunc(value)
+	}
+}
+
+func TestFunctionLiteralWithName(t *testing.T) {
+	input := `let myFunction = fn() { };`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Body does not contain %d statements. got=%d\n",
+			1, len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.LetStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.LetStatement. got=%T",
+			program.Statements[0])
+	}
+
+	function, ok := stmt.Value.(*ast.FunctionLiteral)
+	if !ok {
+		t.Fatalf("stmt.Value is not ast.FunctionLiteral. got=%T",
+			stmt.Value)
+	}
+
+	if function.Name != "myFunction" {
+		t.Fatalf("function literal name wrong. want 'myFunction', got=%q\n",
+			function.Name)
 	}
 }
 

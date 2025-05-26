@@ -143,5 +143,6 @@ func GetBuiltinByName(name string) *Builtin {
 			return def.Builtin
 		}
 	}
+
 	return nil
 }

@@ -65,6 +65,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isError(right) {
 			return right
 		}
+
 		return evalInfixExpression(node.Operator, left, right)
 
 	case *ast.IfExpression:
@@ -87,6 +88,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if len(args) == 1 && isError(args[0]) {
 			return args[0]
 		}
+
 		return applyFunction(function, args)
 
 	case *ast.ArrayLiteral:
@@ -105,11 +107,13 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isError(index) {
 			return index
 		}
+
 		return evalIndexExpression(left, index)
 
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
 	}
+
 	return nil
 }
 
@@ -122,7 +126,6 @@ func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 		switch result := result.(type) {
 		case *object.ReturnValue:
 			return result.Value
-
 		case *object.Error:
 			return result
 		}
@@ -160,10 +163,8 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 	switch operator {
 	case "!":
 		return evalBangOperatorExpression(right)
-
 	case "-":
 		return evalMinusPrefixOperatorExpression(right)
-
 	default:
 		return newError("unknown operator: %s%s", operator, right.Type())
 	}
@@ -195,13 +196,10 @@ func evalBangOperatorExpression(right object.Object) object.Object {
 	switch right {
 	case TRUE:
 		return FALSE
-
 	case FALSE:
 		return TRUE
-
 	case NULL:
 		return TRUE
-
 	default:
 		return FALSE
 	}
@@ -213,7 +211,6 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 	}
 
 	value := right.(*object.Integer).Value
-
 	return &object.Integer{Value: -value}
 }
 
@@ -293,13 +290,10 @@ func isTruthy(obj object.Object) bool {
 	switch obj {
 	case NULL:
 		return false
-
 	case TRUE:
 		return true
-
 	case FALSE:
 		return false
-
 	default:
 		return true
 	}
